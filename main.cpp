@@ -16,6 +16,8 @@
 
 
 
+
+
 /* Send-arp Daechoong Process */
 
 //==> Attacker packet send ->> reply packet come..
@@ -110,18 +112,6 @@ char* Get_MacAdddress(const char *ifname, uint8_t *mac_addr){
     close(sockfd);
 }
 
-void show_packet (uint8_t* packet, uint16_t packet_size){
- for (int i = 0; i < packet_size ; i++) {
-    printf("%x ", packet[i]);
-    if(((i + 1) % 16)==0) {
-        printf("\n");
-    }
-    if(((i + 1) % 16)==8) {
-        printf("  ");
-    }
-  }
-  printf("============================\n");
-}
 
 
 int main(int argc, char* argv[]) {
@@ -129,7 +119,7 @@ int main(int argc, char* argv[]) {
     usage();
     return -1;
   }
-printf("%d", argc);
+  
     char* dev = argv[1];
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_t* handle = pcap_open_live(dev, BUFSIZ, 1, 1000, errbuf);
@@ -145,7 +135,6 @@ printf("%d", argc);
     printf("Success to get myMAC address as" MAC_ADDR_FMT"\n ", MAC_ADDR_FMT_ARGS(mac_addr));
     
 
-
   char * sender_ip[(argc - 2) / 2];
   Mac sender_mac[(argc - 2) / 2];
   char * target_ip[(argc - 2) / 2];
@@ -156,7 +145,7 @@ printf("%d", argc);
     target_ip[i] = argv[2*i +3];
   }
 
-  
+
  //=============================================> Send-arp(1)  ->  Get Sender mac 
   int i = 0;
   while (i++ < (argc - 2)/2){
@@ -178,7 +167,7 @@ printf("%d", argc);
 
     int res = pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&packet), sizeof(EthArpPacket));
     if (res != 0) {
-        fprintf(stderr, "pcap_sendpacket return %d error=%s\n", res, pcap_geterr(handle));
+        fprintf(stderr, "pcap_sendpacket return1 %d error=%s\n", res, pcap_geterr(handle));
     }
 
     struct pcap_pkthdr* header;
@@ -222,7 +211,7 @@ printf("%d", argc);
 
     int res = pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&packet), sizeof(EthArpPacket));
     if (res != 0) {
-        fprintf(stderr, "pcap_sendpacket return %d error=%s\n", res, pcap_geterr(handle));
+        fprintf(stderr, "pcap_sendpacket return2 %d error=%s\n", res, pcap_geterr(handle));
     }
 
     struct pcap_pkthdr* header;
@@ -267,20 +256,10 @@ printf("%d", argc);
     
     int res = pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&packet), sizeof(EthArpPacket));
     if (res != 0) {
-        fprintf(stderr, "pcap_sendpacket return %d error=%s\n", res, pcap_geterr(handle));
+        fprintf(stderr, "pcap_sendpacket return3 %d error=%s\n", res, pcap_geterr(handle));
     }    
   }
 
-
-  // ==> Relay
-  //========request packet===========
-  // Ethernet_smac : Iam
-  // Ethernet_dmac : Target(==Gateway)
-  // ARPsender : Sender = Victim
-  // IPsender : Sender = Victim
-  // ARPtarget : Target(==Gateway)
-  // IPtarget : Target(==Gateway)'s IP
-  //=================================
 
  //=============================================> Relay Packets
   i = 0;
@@ -316,7 +295,7 @@ printf("%d", argc);
         int res = pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&reppacket), sizeof(EthArpPacket));
         
 	if (res != 0) {
-        fprintf(stderr, "pcap_sendpacket return %d error=%s\n", res, pcap_geterr(handle));
+        fprintf(stderr, "pcap_sendpacket return4 %d error=%s\n", res, pcap_geterr(handle));
         }    
     
       }
@@ -348,11 +327,11 @@ printf("%d", argc);
     
     int res = pcap_sendpacket(handle, reinterpret_cast<const u_char*>(&packet), sizeof(EthArpPacket));
     if (res != 0) {
-        fprintf(stderr, "pcap_sendpacket return %d error=%s\n", res, pcap_geterr(handle));
+        fprintf(stderr, "pcap_sendpacket return5 %d error=%s\n", res, pcap_geterr(handle));
     }    
     
       
-      printf("*****%s's arp table Recover*****\n", sender_ip[i]);
+      printf("\n*****%s's arp table Recover*****\n", sender_ip[i]);
       printf("\n");
     
     }
@@ -361,8 +340,6 @@ printf("%d", argc);
     
 
 }
-
-
 
 
 
